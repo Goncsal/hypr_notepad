@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -o nounset
+set -o pipefail
+
+address=${1:-}
+[[ $address =~ ^0x[0-9a-fA-F]+$ ]] || exit 2
+
+monitor_id=
+window_width=
+for _ in {1..20}; do
+    clients=$(hyprctl clients -j) || exit 1
+    read -r monitor_id window_width < <(
+        jq -r --arg address "$address" \
+            '.[] | select(.address == $address) | [.monitor, .size[0]] | @tsv' \
+            <<<"$clients"
+    )
+    [[ -n ${monitor_id:-} && -n ${window_width:-} ]] && break
+    sleep 0.05
+done
+[[ -n ${monitor_id:-} && -n ${window_width:-} ]] || exit 1
+
+monitors=$(hyprctl monitors -j) || exit 1
+read -r monitor_x monitor_y monitor_width monitor_scale reserved_top reserved_right < <(
+    jq -r --argjson id "$monitor_id" \
+        '.[] | select(.id == $id) | [.x, .y, .width, .scale, .reserved[1], .reserved[2]] | @tsv' \
+        <<<"$monitors"
+)
+border=$(hyprctl getoption general:border_size -j | jq -r '.int') || exit 1
+
+read -r target_x target_y < <(
+    awk -v mx="$monitor_x" -v my="$monitor_y" -v mw="$monitor_width" \
+        -v scale="$monitor_scale" -v rt="$reserved_top" -v rr="$reserved_right" \
+        -v border="$border" -v ww="$window_width" \
+        'BEGIN {
+            printf "%d %d\n", int(mx + (mw / scale) - rr - border - ww + 0.5), int(my + rt + border + 0.5)
+        }'
+)
+
+hyprctl dispatch movewindowpixel "exact $target_x $target_y,address:$address" >/dev/null

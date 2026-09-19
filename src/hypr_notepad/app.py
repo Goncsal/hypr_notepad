@@ -22,7 +22,7 @@ class NoteWindow(Gtk.ApplicationWindow):
     def __init__(self, application: Gtk.Application, path: Path, command: list[str]) -> None:
         super().__init__(application=application, title=f"Hypr Notepad - {path.name}")
         self.set_default_size(720, 480)
-        self.set_size_request(420, 280)
+        self.set_size_request(320, 280)
         self._child_running = True
         self._close_approved = False
 

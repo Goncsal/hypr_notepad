@@ -25,6 +25,7 @@ python3 -m venv --system-site-packages "$app_home/venv"
 "$app_home/venv/bin/python" -m pip install --no-build-isolation --no-deps --upgrade "$project_dir"
 mkdir -p "$data_home/applications" "$hypr_dir" "$bin_home"
 ln -sf "$app_home/venv/bin/hypr-notepad" "$bin_home/hypr-notepad"
+install -m 0755 "$project_dir/scripts/hypr-notepad-position" "$bin_home/hypr-notepad-position"
 install -m 0644 "$project_dir/assets/hypr-notepad.desktop" "$data_home/applications/"
 
 hypr_version=$(Hyprland --version 2>/dev/null | sed -n 's/.*Hyprland v\{0,1\}\([0-9][0-9.]*\).*/\1/p' | head -n 1)
@@ -47,7 +48,9 @@ fi
 
 if [ -f "$hypr_lua" ]; then
   generated_lua=$(mktemp)
-  sed "s|@EXEC@|$bin_home/hypr-notepad|" "$project_dir/hypr/hypr-notepad.lua" > "$generated_lua"
+  sed -e "s|@EXEC@|$bin_home/hypr-notepad|" \
+      -e "s|@POSITIONER@|$bin_home/hypr-notepad-position|" \
+      "$project_dir/hypr/hypr-notepad.lua" > "$generated_lua"
   install -m 0644 "$generated_lua" "$hypr_dir/hypr-notepad.lua"
   rm -f "$generated_lua"
   lua_line="dofile(\"$hypr_dir/hypr-notepad.lua\")"

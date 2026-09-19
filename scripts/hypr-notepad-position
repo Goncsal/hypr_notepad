@@ -21,20 +21,26 @@ done
 [[ -n ${monitor_id:-} && -n ${window_width:-} ]] || exit 1
 
 monitors=$(hyprctl monitors -j) || exit 1
-read -r monitor_x monitor_y monitor_width monitor_scale reserved_top reserved_right < <(
+read -r monitor_x monitor_y monitor_width monitor_height monitor_scale reserved_left reserved_top reserved_right reserved_bottom < <(
     jq -r --argjson id "$monitor_id" \
-        '.[] | select(.id == $id) | [.x, .y, .width, .scale, .reserved[1], .reserved[2]] | @tsv' \
+        '.[] | select(.id == $id) | [.x, .y, .width, .height, .scale, .reserved[0], .reserved[1], .reserved[2], .reserved[3]] | @tsv' \
         <<<"$monitors"
 )
 border=$(hyprctl getoption general:border_size -j | jq -r '.int') || exit 1
 
 read -r target_x target_y < <(
-    awk -v mx="$monitor_x" -v my="$monitor_y" -v mw="$monitor_width" \
-        -v scale="$monitor_scale" -v rt="$reserved_top" -v rr="$reserved_right" \
-        -v border="$border" -v ww="$window_width" \
+    awk -v mx="$monitor_x" -v my="$monitor_y" -v mw="$monitor_width" -v mh="$monitor_height" \
+        -v scale="$monitor_scale" -v rl="$reserved_left" -v rt="$reserved_top" \
+        -v rr="$reserved_right" -v rb="$reserved_bottom" -v border="$border" -v ww="$window_width" \
         'BEGIN {
-            printf "%d %d\n", int(mx + (mw / scale) - rr - border - ww + 0.5), int(my + rt + border + 0.5)
+            usable_w = (mw / scale) - rl - rr - (2 * border)
+            usable_h = (mh / scale) - rt - rb - (2 * border)
+            x = mx + (mw / scale) - rr - border - ww - (usable_w * (3 / 1194))
+            y = my + rt + border + (usable_h * (2 / 640))
+            printf "%d %d\n", int(x + 0.5), int(y + 0.5)
         }'
 )
 
-hyprctl dispatch movewindowpixel "exact $target_x $target_y,address:$address" >/dev/null
+hyprctl dispatch \
+    "hl.dsp.window.move({ x = $target_x, y = $target_y, window = \"address:$address\" })" \
+    >/dev/null

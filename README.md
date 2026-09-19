@@ -10,12 +10,13 @@ The app uses `$VISUAL`, then `$EDITOR`, and falls back to Neovim, Vim, Vi, or Na
 - Python 3.11 or newer
 - GTK 3 and its Python GObject bindings
 - VTE 2.91 and its Python bindings
+- jq
 - A terminal editor
 
 On Arch Linux, install the runtime dependencies with:
 
 ```sh
-sudo pacman -S python-gobject gtk3 vte3
+sudo pacman -S python-gobject gtk3 vte3 jq
 ```
 
 ## Install
@@ -34,7 +35,7 @@ The dedicated stylesheet is installed inside the Python package from `src/hypr_n
 
 ## Hyprland compatibility
 
-The app does not use Hyprland internals. The installer supports Lua configuration, current Hyprlang match rules, and the legacy `windowrulev2` form. The Hyprlang binding follows `$mainMod`. The Lua integration uses `ALT`, matching the migrated configuration generated from this setup's `ALT_L` modifier.
+The installer supports Lua configuration, current Hyprlang match rules, and the legacy `windowrulev2` form. On Lua configurations, the editor position is calculated from the current monitor size, scale, reserved panel area, border size, and window size. The Hyprlang binding follows `$mainMod`. The Lua integration uses `ALT`, matching the migrated configuration generated from this setup's `ALT_L` modifier.
 
 ## Development
 

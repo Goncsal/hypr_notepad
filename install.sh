@@ -15,6 +15,11 @@ command -v python3 >/dev/null 2>&1 || {
   exit 1
 }
 
+command -v jq >/dev/null 2>&1 || {
+  echo "jq is required" >&2
+  exit 1
+}
+
 python3 -c 'import gi; gi.require_version("Gtk", "3.0"); gi.require_version("Vte", "2.91")' 2>/dev/null || {
   echo "GTK 3, VTE 2.91, and their Python bindings are required." >&2
   echo "Arch: sudo pacman -S python-gobject gtk3 vte3" >&2

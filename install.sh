@@ -8,6 +8,7 @@ bin_home=${HOME}/.local/bin
 app_home=${data_home}/hypr-notepad
 hypr_dir=${config_home}/hypr
 hypr_config=${hypr_dir}/hyprland.conf
+hypr_lua=${hypr_dir}/hyprland.lua
 
 command -v python3 >/dev/null 2>&1 || {
   echo "python3 is required" >&2
@@ -42,6 +43,15 @@ if [ -f "$hypr_config" ]; then
   grep -Fqx "$source_line" "$hypr_config" || printf '\n%s\n' "$source_line" >> "$hypr_config"
 else
   printf '%s\n' "$source_line" > "$hypr_config"
+fi
+
+if [ -f "$hypr_lua" ]; then
+  generated_lua=$(mktemp)
+  sed "s|@EXEC@|$bin_home/hypr-notepad|" "$project_dir/hypr/hypr-notepad.lua" > "$generated_lua"
+  install -m 0644 "$generated_lua" "$hypr_dir/hypr-notepad.lua"
+  rm -f "$generated_lua"
+  lua_line="dofile(\"$hypr_dir/hypr-notepad.lua\")"
+  grep -Fqx "$lua_line" "$hypr_lua" || printf '\n%s\n' "$lua_line" >> "$hypr_lua"
 fi
 
 command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1 || true

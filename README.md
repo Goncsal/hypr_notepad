@@ -24,7 +24,7 @@ sudo pacman -S python-gobject gtk3 vte3
 ./install.sh
 ```
 
-The installer creates an isolated environment under `~/.local/share/hypr-notepad` and adds a small sourced file at `~/.config/hypr/hypr-notepad.conf`. It does not replace the main Hyprland configuration. Run the installer again after updating the project.
+The installer creates an isolated environment under `~/.local/share/hypr-notepad` and adds a small integration file under `~/.config/hypr`. Lua-based Hyprland setups receive `hypr-notepad.lua`, while Hyprlang setups receive `hypr-notepad.conf`. It does not replace the main Hyprland configuration. Run the installer again after updating the project.
 
 If `~/.local/bin` is not in `PATH`, add it in the environment used to start Hyprland.
 
@@ -34,7 +34,7 @@ The dedicated stylesheet is installed inside the Python package from `src/hypr_n
 
 ## Hyprland compatibility
 
-The app does not use Hyprland internals. The installer detects the installed Hyprland version and selects either the legacy `windowrulev2` form or the current named-match form. Both integrations use the long-standing `bind` and `source` features. The binding follows `$mainMod`, so it works with setups where the modifier is `ALT_L`, `SUPER`, or another key.
+The app does not use Hyprland internals. The installer supports Lua configuration, current Hyprlang match rules, and the legacy `windowrulev2` form. The Hyprlang binding follows `$mainMod`. The Lua integration uses `ALT`, matching the migrated configuration generated from this setup's `ALT_L` modifier.
 
 ## Development
 

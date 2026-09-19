@@ -1,0 +1,12 @@
+/* Remove these declarations to use every system theme default. */
+window {
+  background: @theme_bg_color;
+  color: @theme_fg_color;
+}
+
+vte-terminal {
+  font-family: monospace;
+  font-size: 12pt;
+  padding: 12px;
+}
+

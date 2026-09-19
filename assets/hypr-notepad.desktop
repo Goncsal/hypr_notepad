@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Hypr Notepad
+Comment=Open a quick note in your terminal editor
+Exec=hypr-notepad
+Icon=accessories-text-editor
+Terminal=false
+Categories=Utility;TextEditor;
+StartupNotify=true
+
